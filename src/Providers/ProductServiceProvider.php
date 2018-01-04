@@ -1,12 +1,16 @@
 <?php
 
-namespace Jag\Dashboard;
+namespace Jag\Dashboard\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Jag\Dashboard\Traits\CreateMigrationTrait;
 
 class ProductServiceProvider extends ServiceProvider
 {
+    use CreateMigrationTrait;
+
     /**
      * @var boolean
      */
@@ -19,6 +23,8 @@ class ProductServiceProvider extends ServiceProvider
     {
         $this->mergeConfig();
         $this->registerRoutes();
+        $this->publishConfig();
+        $this->publishMigrations();
     }
 
     /**
@@ -49,12 +55,33 @@ class ProductServiceProvider extends ServiceProvider
         );
     }
 
+    protected function publishConfig()
+    {
+        $this->publishes([
+            __DIR__.'/../config.php' => config_path('dashboard/product.php')
+        ]);
+    }
+
     protected function registerRoutes()
     {
-        Route::prefix(config('dashboard.uri'))
+        Route::prefix(config('dashboard.dashboard.uri'))
              ->middleware(['web', 'auth'])
-             ->name(config('dashboard.uri'). ':')
+             ->name(config('dashboard.dashboard.uri'). ':')
              ->namespace('Jag\Dashboard\Controllers')
              ->group(__DIR__ . '/../routes/web.php');
+    }
+
+    protected function publishMigrations()
+    {
+        $timestamp = new Carbon();
+
+        foreach([
+            'products',
+            'categories',
+            'images',
+            'tags'
+        ] as $migration) {
+            $this->createMigration($migration, $timestamp->addSecond()->format('Y_m_d_His'), __DIR__);
+        }
     }
 }
