@@ -51,14 +51,14 @@ class ProductServiceProvider extends ServiceProvider
     protected function mergeConfig()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config.php', 'dashboard.product'
+            __DIR__ . '/../../config.php', 'dashboard.product'
         );
     }
 
     protected function publishConfig()
     {
         $this->publishes([
-            __DIR__.'/../config.php' => config_path('dashboard/product.php')
+            __DIR__.'/../../config.php' => config_path('dashboard/product.php')
         ]);
     }
 
@@ -68,7 +68,7 @@ class ProductServiceProvider extends ServiceProvider
              ->middleware(['web', 'auth'])
              ->name(config('dashboard.dashboard.uri'). ':')
              ->namespace('Jag\Dashboard\Controllers')
-             ->group(__DIR__ . '/../routes/web.php');
+             ->group(__DIR__ . '/../../routes/web.php');
     }
 
     protected function publishMigrations()
